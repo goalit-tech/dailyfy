@@ -2,7 +2,8 @@
 		xmlns="sap.m"
         xmlns:l="sap.ui.layout"
 	    xmlns:f="sap.ui.layout.form"
-		xmlns:core="sap.ui.core">
+		xmlns:core="sap.ui.core"
+		xmlns:custom="goalittech.ui.reuse.milkcalendar.control">
 	<Dialog id="idDialogEdit"
 		title="{i18n>editDialogTitle}"
         contentWidth="100%"
@@ -51,12 +52,12 @@
 					</layoutData>
 				</Input>
 				<Label id="idLabelBaseQuantity" text="{i18n>baseQuantity}" />
-				<StepInput id="idStepInputBaseQuantity" value="{path: 'defaultQuantity_quantity', type: 'sap.ui.model.type.Float', formatOptions: {decimals: 2}}"
+				<custom:QuantityStepInput id="idStepInputBaseQuantity" value="{path: 'defaultQuantity_quantity', type: 'sap.ui.model.type.Float', formatOptions: {maxFractionDigits: 2}}"
 					min="0" max="5" step="1" displayValuePrecision="2">
-					<layoutData>
+					<custom:layoutData>
 						<l:GridData id="idGridDataBaseQuantity" span="XL4 L3 M3 S8" />
-					</layoutData>
-				</StepInput>
+					</custom:layoutData>
+				</custom:QuantityStepInput>
 				<Input id="idInputUom" value="{defaultQuantity_uom}">
 					<layoutData>
 						<l:GridData id="idGridDataUom" span="XL1 L2 M2 S4" />

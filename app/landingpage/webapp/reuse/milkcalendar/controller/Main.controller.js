@@ -15,31 +15,13 @@ sap.ui.define([
     "use strict";
 
     const DATE_KEY_FORMAT = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
+    const MONTH_FORMAT = DateFormat.getDateInstance({ pattern: "MMM yyyy" });
     // sap.ui.unified.CalendarDayType values used for the day colours
     const CALENDAR_TYPE = { Error: "Type02", Warning: "Type06", Success: "Type08" };
 
     return Controller.extend("goalittech.ui.reuse.milkcalendar.controller.Main", {
         oFormatYyyymmdd: null,
         onInit() {
-            this.getView().setModel(new JSONModel({
-                totalAmount: 240,
-                currency: "₹",
-                liters: 12.5,
-                days: 12
-            }), "summary");
-            this.getView().setModel(new JSONModel({
-                baseQty: 1,
-                days: this._getMockDays()
-            }), "cal");
-            this.getView().setModel(new JSONModel({
-                months: [
-                    { month: "Oct 2026", amount: 240, liters: 12.5, days: 12, paid: true },
-                    { month: "Sep 2026", amount: 300, liters: 15, days: 15, paid: false },
-                    { month: "Aug 2026", amount: 280, liters: 14, days: 14, paid: true },
-                    { month: "Jul 2026", amount: 260, liters: 13, days: 13, paid: true },
-                    { month: "Jun 2026", amount: 320, liters: 16, days: 16, paid: false }
-                ]
-            }), "monthly");
             this.getView().setModel(new JSONModel({
                 showQuantity: false,
                 toggleIntervalSelection: false,
@@ -50,6 +32,75 @@ sap.ui.define([
                 vendorMobileNo: ""
             }), "local");
             this.oFormatYyyymmdd = DateFormat.getInstance({ pattern: "yyyy-MM-dd", calendarType: CalendarType.Gregorian });
+            this._bindProduct();
+            this.byId("idUnifiedCalendar").attachModelContextChange(() => this._initLogs());
+            this._bindCurrentMonthSummary();
+        },
+        // Binds the rate / base quantity section to the first product, if there is one yet
+        async _bindProduct() {
+            try {
+                const [oContext] = await this._getProductsBinding().requestContexts(0, 1);
+                this._setProductContext(oContext);
+            } finally {
+                this._initLogs();
+            }
+        },
+        // Reads the current month once the calendar's logs binding exists (it needs the model and is created suspended)
+        _initLogs() {
+            if (!this._bLogsInitialized && this._getLogsBinding()) {
+                this._bLogsInitialized = true;
+                this._loadLogsOfMonth(new Date());
+            }
+        },
+        // The logs binding starts suspended: only the displayed month is read from the backend
+        _loadLogsOfMonth(oDate) {
+            const oBinding = this._getLogsBinding();
+            if (!oBinding) {
+                return;
+            }
+            oBinding.getAllCurrentContexts().filter((o) => o.isInactive()).forEach((o) => o.delete().catch(() => { }));
+            const oFirst = new Date(oDate.getFullYear(), oDate.getMonth(), 1);
+            const oLast = new Date(oDate.getFullYear(), oDate.getMonth() + 1, 0);
+            oBinding.filter(new Filter("logDate", FilterOperator.BT, DATE_KEY_FORMAT.format(oFirst), DATE_KEY_FORMAT.format(oLast)));
+            if (oBinding.isSuspended()) {
+                oBinding.resume();
+            }
+        },
+        onCalendarStartDateChange(oEvent) {
+            const oLocal = this.getView().getModel("local");
+            oLocal.setProperty("/isDateSelected", false);
+            oLocal.setProperty("/showQuantity", false);
+            this.byId("idStepInputQuantity").setBindingContext(null);
+            this._loadLogsOfMonth(oEvent.getSource().getStartDate());
+        },
+        _setProductContext(oContext) {
+            this._oProductContext = oContext ?? null;
+            this.byId("idHBoxSummary").setBindingContext(this._oProductContext);
+        },
+        // Binds the total summary text to the backend summary of the current month
+        async _bindCurrentMonthSummary() {
+            const oToday = new Date();
+            this._oSummaryBinding ??= this.getOwnerComponent().getModel().bindList("/MonthlySummary", null, null, [
+                new Filter("year", FilterOperator.EQ, oToday.getFullYear()),
+                new Filter("month", FilterOperator.EQ, oToday.getMonth() + 1)
+            ]);
+            const [oContext] = await this._oSummaryBinding.requestContexts(0, 1);
+            this.byId("idFormattedTextTotalAmount").setBindingContext(oContext ?? null);
+        },
+        // Reloads the summaries after the logged quantities changed in the backend
+        _refreshSummaries() {
+            this.byId("idListMonthlySummary").getBinding("items")?.refresh();
+            this._oSummaryBinding?.refresh();
+            this._bindCurrentMonthSummary();
+        },
+        _getLogsBinding() {
+            const oBinding = this.byId("idUnifiedCalendar").getBinding("specialDates");
+            if (oBinding && this._oLogsBinding !== oBinding) {
+                this._oLogsBinding = oBinding;
+                oBinding.attachPatchCompleted(() => this._refreshSummaries());
+                oBinding.attachCreateCompleted(() => this._refreshSummaries());
+            }
+            return oBinding;
         },
         onCalendarTogglePress(oEvent) {
             if (oEvent.getParameter("pressed") === false) {
@@ -83,14 +134,16 @@ sap.ui.define([
         },
         // Binds /Products: edits the first product, or creates a new one (saved on Update) when none exists
         async _getProductContext() {
-            const oModel = this.getView().getModel();
-            this._oProductsBinding ??= oModel.bindList("/Products", null, null, null, {
+            const [oContext] = await this._getProductsBinding().requestContexts(0, 1);
+            return oContext ?? this._oProductsBinding.create({}, true);
+        },
+        _getProductsBinding() {
+            this._oProductsBinding ??= this.getOwnerComponent().getModel().bindList("/Products", null, null, null, {
                 $select: ["ID", "name", "description", "vendor_ID", "unitPrice_amount", "unitPrice_currency",
                     "defaultQuantity_quantity", "defaultQuantity_uom"],
                 $expand: { vendor: { $select: ["ID", "name", "email", "address", "mobileNo"] } }
             });
-            const [oContext] = await this._oProductsBinding.requestContexts(0, 1);
-            return oContext ?? this._oProductsBinding.create({}, true);
+            return this._oProductsBinding;
         },
         // Returns the vendor context for the entered vendor; creates the vendor in the backend when it doesn't exist yet.
         // Email, address and mobile number changes of an existing vendor are queued in the "productEdit" group.
@@ -145,6 +198,8 @@ sap.ui.define([
                 }
                 // reload so that the expanded vendor data reflects the changes
                 this._oProductsBinding.refresh();
+                this._setProductContext(oContext);
+                this._oLogsBinding?.refresh();
                 this.oEditDialog.close();
                 MessageToast.show(oBundle.getText("saveSuccess"));
             } catch (oError) {
@@ -175,17 +230,17 @@ sap.ui.define([
             ]);
         },
         formatMonthlySummary(sText, sCurrency, fAmount, fLiters, iDays) {
-            return formatMessage(sText ?? "", [sCurrency ?? "", fAmount ?? 0, fLiters ?? 0, iDays ?? 0]);
+            return formatMessage(sText ?? "", [sCurrency ?? "", Number(fAmount ?? 0), Number(fLiters ?? 0), iDays ?? 0]);
         },
-        formatCalendarDate(value) {
-            return value ? DATE_KEY_FORMAT.parse(value) : null;
+        formatMonth(iYear, iMonth) {
+            return MONTH_FORMAT.format(new Date(iYear, iMonth - 1, 1));
         },
         // quantity is null when the day has no record; 0 or no record => Error, == base => Success, else Warning
         formatQuantityState(fQuantity, fBaseQty) {
             if (fQuantity == null || Number(fQuantity) === 0) {
                 return ValueState.Error;
             }
-            return Number(fQuantity) === Number(fBaseQty) ? ValueState.Success : ValueState.Warning;
+            return fBaseQty == null || Number(fQuantity) === Number(fBaseQty) ? ValueState.Success : ValueState.Warning;
         },
         formatCalendarType(fQuantity, fBaseQty) {
             return CALENDAR_TYPE[this.formatQuantityState(fQuantity, fBaseQty)];
@@ -218,28 +273,29 @@ sap.ui.define([
         },
 
 
-        _onSingleDateSelect(oEvent) {
-            this.getView().getModel("local").setProperty("/isDateSelected", true);
+        async _onSingleDateSelect(oEvent) {
+            const oLocal = this.getView().getModel("local");
+            oLocal.setProperty("/isDateSelected", true);
             const oDate = oEvent.getSource().getSelectedDates()[0]?.getStartDate();
-            const sKey = oDate && DATE_KEY_FORMAT.format(oDate);
-            const iIndex = this.getView().getModel("cal").getProperty("/days").findIndex((o) => o.logDate === sKey);
-            this.byId("idStepInputQuantity").bindElement({ path: `/days/${iIndex}`, model: "cal" });
-            if (!this.getView().getModel("local").getProperty("/toggleIntervalSelection")) {
-                this.getView().getModel("local").setProperty("/showQuantity", true);
+            const oContext = oDate ? this._getLogContext(DATE_KEY_FORMAT.format(oDate)) : null;
+            this.byId("idStepInputQuantity").setBindingContext(oContext);
+            if (!oLocal.getProperty("/toggleIntervalSelection")) {
+                oLocal.setProperty("/showQuantity", !!oContext);
             }
         },
-        // Mock of the backend response: one entry per day, quantity null = no record for that day
-        _getMockDays() {
-            const aQuantities = [1, 1, 2, null, 1, 0, 1, 1, 0.5, null];
-            const oToday = new Date();
-            return Array.from({ length: oToday.getDate() }, (_, i) => {
-                const oDay = new Date(oToday.getFullYear(), oToday.getMonth(), i + 1);
-                return {
-                    logDate: DATE_KEY_FORMAT.format(oDay),
-                    quantity: aQuantities[i % aQuantities.length],
-                    remarks: ""
-                };
-            });
+        // Returns the log of the day; for a day without a log an inactive one is created, which is only
+        // sent to the backend once the quantity is changed. Needs the product of the logs.
+        _getLogContext(sDate) {
+            const oBinding = this._getLogsBinding();
+            const sProductId = this._oProductContext?.getProperty("ID");
+            if (!oBinding || !sProductId) {
+                return null;
+            }
+            const aContexts = oBinding.getAllCurrentContexts();
+            aContexts.filter((o) => o.isInactive() && o.getProperty("logDate") !== sDate)
+                .forEach((o) => o.delete().catch(() => { }));
+            return aContexts.find((o) => o.getProperty("logDate") === sDate)
+                ?? oBinding.create({ logDate: sDate, product_ID: sProductId }, true, false, true);
         }
     });
 });
