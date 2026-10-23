@@ -1,0 +1,7 @@
+{
+	"namespace": "goalittech.ui.reuse",
+	"hostNamespace": "goalittech.ui",
+	"targetDir": "app/landingpage/webapp/reuse",
+	"hostManifest": "app/landingpage/webapp/manifest.json",
+	"libs": ["sap.m", "sap.ui.core", "sap.ui.layout"]
+}

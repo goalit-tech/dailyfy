@@ -1,0 +1,27 @@
+<mvc:View controllerName="goalittech.ui.controller.Home"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	displayBlock="true">
+	<Page showHeader="false"
+		class="sapUiContentPadding">
+		<content>
+			<VBox class="sapUiMediumMarginBottom">
+				<Title text="{i18n>homeHeading}"
+					level="H2"
+					class="sapUiSmallMarginBottom" />
+				<Text text="{i18n>homeIntro}" />
+			</VBox>
+			<FlexBox wrap="Wrap"
+				items="{reuse>/}">
+				<GenericTile class="sapUiSmallMarginEnd sapUiSmallMarginBottom"
+					header="{reuse>text}"
+					subheader="{reuse>description}"
+					press=".onTilePress">
+					<TileContent>
+						<ImageContent src="{reuse>icon}" />
+					</TileContent>
+				</GenericTile>
+			</FlexBox>
+		</content>
+	</Page>
+</mvc:View>

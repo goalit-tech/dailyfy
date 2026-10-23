@@ -1,0 +1,24 @@
+<mvc:View controllerName="goalittech.ui.reuse.sample.controller.Detail"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:form="sap.ui.layout.form"
+	displayBlock="true">
+	<Page id="page"
+		title="{i18n>detailViewTitle}"
+		showNavButton="true"
+		navButtonPress=".onNavBack"
+		enableScrolling="true"
+		class="sapUiContentPadding samplePage">
+		<form:SimpleForm editable="false"
+			layout="ResponsiveGridLayout">
+			<Label text="ID" />
+			<Text text="{id}" />
+			<Label text="Name" />
+			<Text text="{name}" />
+			<Label text="Category" />
+			<Text text="{category}" />
+			<Label text="Description" />
+			<Text text="{description}" />
+		</form:SimpleForm>
+	</Page>
+</mvc:View>

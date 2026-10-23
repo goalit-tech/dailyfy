@@ -1,0 +1,110 @@
+{
+	"_version": "__MANIFEST_VERSION__",
+	"sap.app": {
+		"id": "__NAMESPACE__",
+		"type": "application",
+		"i18n": {
+			"bundleUrl": "i18n/i18n.properties",
+			"supportedLocales": [
+				""
+			],
+			"fallbackLocale": ""
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"applicationVersion": {
+			"version": "1.0.0"
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"contentDensities": {
+			"cozy": true,
+			"compact": true
+		},
+		"rootView": {
+			"viewName": "__NAMESPACE__.view.App",
+			"type": "XML",
+			"id": "app"
+		},
+		"dependencies": {
+			"minUI5Version": "__MIN_UI5_VERSION__",
+			"libs": {}
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "__NAMESPACE__.i18n.i18n",
+					"supportedLocales": [
+						""
+					],
+					"fallbackLocale": ""
+				}
+			},
+			"": {
+				"type": "sap.ui.model.json.JSONModel",
+				"uri": "model/items.json"
+			}
+		},
+		"resources": {
+			"css": [
+				{
+					"uri": "css/style.css"
+				}
+			]
+		},
+		"routing": {
+			"config": {
+				"routerClass": "sap.m.routing.Router",
+				"viewType": "XML",
+				"path": "__NAMESPACE__.view",
+				"controlId": "app",
+				"controlAggregation": "pages",
+				"transition": "slide",
+				"bypassed": {
+					"target": "notFound"
+				}
+			},
+			"routes": [
+				{
+					"name": "list",
+					"pattern": "",
+					"target": "list"
+				},
+				{
+					"name": "detail",
+					"pattern": "detail/{id}",
+					"target": "detail"
+				}
+			],
+			"targets": {
+				"list": {
+					"type": "View",
+					"id": "list",
+					"name": "List",
+					"title": "__TITLE__ List"
+				},
+				"detail": {
+					"type": "View",
+					"id": "detail",
+					"name": "Detail",
+					"title": "__TITLE__ Detail"
+				},
+				"notFound": {
+					"type": "View",
+					"id": "notFound",
+					"name": "NotFound",
+					"transition": "show"
+				}
+			}
+		}
+	}
+}

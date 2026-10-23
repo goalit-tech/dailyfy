@@ -1,0 +1,18 @@
+{
+  "name": "dailyfy",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@sap/cds": "^10"
+  },
+  "devDependencies": {
+    "@cap-js/sqlite": "^3"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "createuiapp": "node codegeneaterescript/ui/create-ui-app.js",
+    "updateuiversions": "node codegeneaterescript/ui/update-ui-versions.js",
+    "updateversions": "node codegeneaterescript/ui/update-ui-versions.js --project"
+  },
+  "private": true
+}

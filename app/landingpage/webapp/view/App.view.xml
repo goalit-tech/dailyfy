@@ -1,0 +1,48 @@
+<mvc:View controllerName="goalittech.ui.controller.App"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:tnt="sap.tnt">
+	<tnt:ToolPage id="toolPage">
+		 <tnt:header>
+            <tnt:ToolHeader id="toolHeader">
+                <Button id="sideNavToggle" type="Transparent" icon="sap-icon://menu2" tooltip="{i18n>menu}"
+                    press=".onSideNavToggle">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Button>
+                <Title id="appTitle" text="{i18n>appName}" level="H1" wrapping="false">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="Disappear" />
+                    </layoutData>
+                </Title>
+                <ToolbarSpacer id="headerSpacer" />
+                <Avatar id="userAvatar" initials="SD" displaySize="XS" tooltip="{i18n>user}">
+                    <layoutData>
+                        <OverflowToolbarLayoutData priority="NeverOverflow" />
+                    </layoutData>
+                </Avatar>
+            </tnt:ToolHeader>
+        </tnt:header>
+		<tnt:sideContent>
+            <tnt:SideNavigation id="sideNavigation" selectedKey="Landingpage" itemSelect=".onItemSelect">
+                <tnt:NavigationList id="navigationList">
+                    <tnt:NavigationListItem id="navProducts" text="{i18n>homeTitle}" icon="sap-icon://home"
+                        key="home" />
+                </tnt:NavigationList>
+            </tnt:SideNavigation>
+        </tnt:sideContent>
+		<!-- <tnt:sideContent>
+			<tnt:SideNavigation itemSelect=".onItemSelect">
+				<tnt:NavigationList id="navigationList">
+					<tnt:NavigationListItem text="{i18n>homeTitle}"
+						icon="sap-icon://home"
+						key="home" />
+				</tnt:NavigationList>
+			</tnt:SideNavigation>
+		</tnt:sideContent> -->
+		<tnt:mainContents>
+			<App id="landingpageContent" />
+		</tnt:mainContents>
+	</tnt:ToolPage>
+</mvc:View>

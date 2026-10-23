@@ -1,0 +1,137 @@
+{
+  "_version": "1.90.0",
+  "sap.app": {
+    "id": "goalittech.ui",
+    "type": "application",
+    "i18n": {
+      "bundleUrl": "i18n/i18n.properties",
+      "supportedLocales": [""],
+      "fallbackLocale": ""
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "sourceTemplate": {
+      "id": "@sap/ux-app-migrator:freestyle",
+      "version": "1.33.0",
+      "toolsId": "bb740c68-3581-429b-8ffc-ab2ecccaab2a"
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "contentDensities": {
+      "cozy": true,
+      "compact": true
+    },
+    "rootView": {
+      "viewName": "goalittech.ui.view.App",
+      "type": "XML",
+      "id": "app"
+    },
+    "componentUsages": {
+      "sampleComponent": {
+        "name": "goalittech.ui.reuse.sample",
+        "settings": {},
+        "componentData": {},
+        "lazy": true
+      },
+      "milkcalendarComponent": {
+        "name": "goalittech.ui.reuse.milkcalendar",
+        "settings": {},
+        "componentData": {},
+        "lazy": true
+      }
+    },
+    "dependencies": {
+      "minUI5Version": "1.153.0",
+      "libs": {
+        "sap.m": {},
+        "sap.tnt": {},
+        "sap.ui.core": {}
+      }
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "goalittech.ui.i18n.i18n",
+          "supportedLocales": [""],
+          "fallbackLocale": ""
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "path": "goalittech.ui.view",
+        "controlId": "landingpageContent",
+        "controlAggregation": "pages",
+        "transition": "slide",
+        "bypassed": {
+          "target": "notFound"
+        },
+        "propagateTitle": true
+      },
+      "routes": [
+        {
+          "name": "home",
+          "pattern": "",
+          "target": "home"
+        }
+      ],
+      "targets": {
+        "home": {
+          "type": "View",
+          "id": "home",
+          "name": "Home",
+          "title": "Home"
+        },
+        "notFound": {
+          "type": "View",
+          "id": "notFound",
+          "name": "NotFound",
+          "transition": "show"
+        }
+      }
+    },
+    "config": {
+      "reuseComponents": [
+        {
+          "key": "sample",
+          "text": "Sample",
+          "description": "Example reuse component with a list and a detail view.",
+          "icon": "sap-icon://product",
+          "usage": "sampleComponent",
+          "prefix": "s",
+          "eventMappings": []
+        },
+        {
+          "key": "milkcalendar",
+          "text": "milkcalendar",
+          "description": "Milk Calendar",
+          "icon": "sap-icon://product",
+          "usage": "milkcalendarComponent",
+          "prefix": "mc",
+          "eventMappings": []
+        }
+      ]
+    }
+  }
+}
