@@ -5,8 +5,9 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sap/base/security/encodeXML",
     "sap/base/strings/formatMessage",
-    "sap/ui/core/ValueState"
-], (Controller, DateFormat, CalendarType, JSONModel, encodeXML, formatMessage, ValueState) => {
+    "sap/ui/core/ValueState",
+    "sap/m/MessageBox"
+], (Controller, DateFormat, CalendarType, JSONModel, encodeXML, formatMessage, ValueState, MessageBox) => {
     "use strict";
 
     const DATE_KEY_FORMAT = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
@@ -63,13 +64,32 @@ sap.ui.define([
             this.oEditDialog ??= await this.loadFragment({
                 name: "goalittech.ui.reuse.milkcalendar.fragment.EditDialog"
             });
+            const oContext = await this._getProductContext();
+            this.oEditDialog.setBindingContext(oContext);
             this.oEditDialog.open();
         },
-        onUpdateEditDialogPress() {
-            this.oEditDialog.close();
+        // Binds /Products: edits the first product, or creates a new one (saved on Update) when none exists
+        async _getProductContext() {
+            const oModel = this.getView().getModel();
+            this._oProductsBinding ??= oModel.bindList("/Products", null, null, null, {
+                $select: ["ID", "name", "unitPrice", "defaultQuantity"],
+                $expand: { vendor: { $select: ["name"] } }
+            });
+            const [oContext] = await this._oProductsBinding.requestContexts(0, 1);
+            return oContext ?? this._oProductsBinding.create({}, true);
+        },
+        async onUpdateEditDialogPress() {
+            const oModel = this.getView().getModel();
+            try {
+                await oModel.submitBatch("productEdit");
+                this.oEditDialog.close();
+            } catch (oError) {
+                MessageBox.error(oError.message);
+            }
         },
 
         onCancelEditDialogPress() {
+            this.getView().getModel().resetChanges("productEdit");
             this.oEditDialog.close();
         },
 

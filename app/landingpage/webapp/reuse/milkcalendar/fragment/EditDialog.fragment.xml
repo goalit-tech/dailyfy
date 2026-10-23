@@ -27,27 +27,29 @@
 			columnsM="1"
 			singleContainerFullSize="false" >
 			<f:content>
+				<Label id="idLabelProductName" text="{i18n>productName}" />
+				<Input id="idInputProductName" value="{name}" />
 				<Label id="idLabelVendorName" text="{i18n>vendorName}" />
-				<Input id="idInputVendorName" value="{vendorName}" />
+				<Input id="idInputVendorName" value="{vendor/name}" editable="false" />
 				<Label id="idLabelRate" text="{i18n>rate}" />
-				<Input id="idInputUnitRate" value="{unitRate}">
+				<Input id="idInputUnitRate" value="{unitPrice/amount}">
 					<layoutData>
 						<l:GridData id="idGridDataUnitRate" span="XL4 L3 M3 S8" />
 					</layoutData>
 				</Input>
-				<Input id="idInputCurrency" value="{currency}">
+				<Input id="idInputCurrency" value="{unitPrice/currency}">
 					<layoutData>
 						<l:GridData id="idGridDataCurrency" span="XL1 L2 M2 S4" />
 					</layoutData>
 				</Input>
 				<Label id="idLabelBaseQuantity" text="{i18n>baseQuantity}" />
-				<StepInput id="idStepInputBaseQuantity" value="{baseQuantity}"
+				<StepInput id="idStepInputBaseQuantity" value="{defaultQuantity/quantity}"
 					min="0" max="5" step="1" displayValuePrecision="2">
 					<layoutData>
 						<l:GridData id="idGridDataBaseQuantity" span="XL4 L3 M3 S8" />
 					</layoutData>
 				</StepInput>
-				<Input id="idInputUom" value="{uom}">
+				<Input id="idInputUom" value="{defaultQuantity/uom}">
 					<layoutData>
 						<l:GridData id="idGridDataUom" span="XL1 L2 M2 S4" />
 					</layoutData>

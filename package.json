@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
+    "@cap-js/postgres": "^3",
     "@sap/cds": "^10"
   },
   "devDependencies": {
@@ -12,6 +13,9 @@
   },
   "scripts": {
     "start": "cds-serve",
+    "watch:pg": "cds watch --profile postgres",
+    "start:pg": "cds-serve --profile postgres",
+    "deploy:pg": "cds deploy --profile postgres",
     "createuiapp": "node _script/ui/create-ui-app.js"
   },
   "private": true,
@@ -25,6 +29,24 @@
         "model": "db",
         "credentials": {
           "url": "dailyfy.db"
+        }
+      }
+    },
+    "[postgres]": {
+      "requires": {
+        "db": {
+          "kind": "postgres",
+          "impl": "@cap-js/postgres",
+          "model": "db",
+          "pool": {
+            "acquireTimeoutMillis": 30000
+          },
+          "credentials": {
+            "port": 5432,
+            "ssl": {
+              "rejectUnauthorized": false
+            }
+          }
         }
       }
     }

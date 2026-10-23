@@ -4,12 +4,15 @@ _out/
 gen/
 
 .cdsrc-private.json
+.env
 default-*.json
 *.sqlite
 
 # SQLite database files (incl. -shm and -wal)
 *.db
 *.db-*
+*.db.*
+postgres*
 
 # MTA
 mta_archives/
