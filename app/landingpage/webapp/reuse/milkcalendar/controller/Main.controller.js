@@ -10,8 +10,9 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/core/Messaging",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], (Controller, DateFormat, CalendarType, JSONModel, encodeXML, formatMessage, ValueState, MessageBox, MessageToast, Messaging, Filter, FilterOperator) => {
+    "sap/ui/model/FilterOperator",
+    "sap/ui/core/date/UI5Date"
+], (Controller, DateFormat, CalendarType, JSONModel, encodeXML, formatMessage, ValueState, MessageBox, MessageToast, Messaging, Filter, FilterOperator, UI5Date) => {
     "use strict";
 
     const DATE_KEY_FORMAT = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
@@ -32,6 +33,7 @@ sap.ui.define([
                 vendorMobileNo: ""
             }), "local");
             this.oFormatYyyymmdd = DateFormat.getInstance({ pattern: "yyyy-MM-dd", calendarType: CalendarType.Gregorian });
+            this.byId("idUnifiedCalendar").setMaxDate(UI5Date.getInstance());
             this._bindProduct();
             this.byId("idUnifiedCalendar").attachModelContextChange(() => this._initLogs());
             this._bindCurrentMonthSummary();
@@ -106,7 +108,11 @@ sap.ui.define([
             if (oEvent.getParameter("pressed") === false) {
                 this.getView().getModel("local").setProperty("/toggleIntervalSelection", false);
                 if (this.getView().getModel("local").getProperty("/isDateSelected")) {
-                    this.getView().getModel("local").setProperty("/showQuantity", true);
+                    const aSelected = this.byId("idUnifiedCalendar").getSelectedDates();
+                    const oDate = aSelected.length === 1 ? aSelected[0].getStartDate() : null;
+                    const oContext = oDate ? this._getLogContext(DATE_KEY_FORMAT.format(oDate)) : null;
+                    this.byId("idStepInputQuantity").setBindingContext(oContext);
+                    this.getView().getModel("local").setProperty("/showQuantity", !!oContext);
                 }
                 return;
             }
@@ -277,25 +283,45 @@ sap.ui.define([
             const oLocal = this.getView().getModel("local");
             oLocal.setProperty("/isDateSelected", true);
             const oDate = oEvent.getSource().getSelectedDates()[0]?.getStartDate();
-            const oContext = oDate ? this._getLogContext(DATE_KEY_FORMAT.format(oDate)) : null;
+            const bInterval = oLocal.getProperty("/toggleIntervalSelection");
+            const oContext = oDate && !bInterval ? this._getLogContext(DATE_KEY_FORMAT.format(oDate)) : null;
             this.byId("idStepInputQuantity").setBindingContext(oContext);
-            if (!oLocal.getProperty("/toggleIntervalSelection")) {
+            if (!bInterval) {
                 oLocal.setProperty("/showQuantity", !!oContext);
             }
         },
-        // Returns the log of the day; for a day without a log an inactive one is created, which is only
-        // sent to the backend once the quantity is changed. Needs the product of the logs.
+        // Returns the log of the day. A day without a log gets one created right away with the product's
+        // default quantity; changing the quantity afterwards updates it. Needs the product of the logs.
         _getLogContext(sDate) {
             const oBinding = this._getLogsBinding();
             const sProductId = this._oProductContext?.getProperty("ID");
-            if (!oBinding || !sProductId) {
+            if (!oBinding || !sProductId || sDate > DATE_KEY_FORMAT.format(new Date())) {
                 return null;
             }
             const aContexts = oBinding.getAllCurrentContexts();
             aContexts.filter((o) => o.isInactive() && o.getProperty("logDate") !== sDate)
                 .forEach((o) => o.delete().catch(() => { }));
-            return aContexts.find((o) => o.getProperty("logDate") === sDate)
-                ?? oBinding.create({ logDate: sDate, product_ID: sProductId }, true, false, true);
+            const oExisting = aContexts.find((o) => o.getProperty("logDate") === sDate);
+            if (oExisting) {
+                return oExisting;
+            }
+            const oLog = { logDate: sDate, product_ID: sProductId };
+            const fDefaultQty = this._oProductContext.getProperty("defaultQuantity_quantity");
+            if (fDefaultQty != null) {
+                oLog.quantity_quantity = fDefaultQty;
+                oLog.quantity_uom = this._oProductContext.getProperty("defaultQuantity_uom");
+            }
+            const oContext = oBinding.create(oLog, true);
+            oContext.created().catch(() => {
+                // the backend rejected the log: drop it so that the day can be selected again
+                if (this.byId("idStepInputQuantity").getBindingContext() === oContext) {
+                    this.byId("idStepInputQuantity").setBindingContext(null);
+                    this.getView().getModel("local").setProperty("/showQuantity", false);
+                }
+                oContext.delete().catch(() => { });
+            });
+            return oContext;
         }
+
     });
 });

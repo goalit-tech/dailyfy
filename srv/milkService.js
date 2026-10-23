@@ -7,6 +7,20 @@ export default class SmartDailyService extends cds.ApplicationService {
         // Takes over price and product from the product and calculates the total amount of the day
         this.before(['CREATE', 'UPDATE'], DailyLogs, async (req) => {
             const oLog = req.data;
+            if (oLog.logDate) {
+                const oNow = new Date();
+                const sToday = `${oNow.getFullYear()}-${String(oNow.getMonth() + 1).padStart(2, '0')}-${String(oNow.getDate()).padStart(2, '0')}`;
+                if (oLog.logDate > sToday) {
+                    return req.error(400, 'Milk cannot be logged for a future date');
+                }
+            }
+            if (req.event === 'CREATE' && oLog.logDate && oLog.product_ID) {
+                const oDuplicate = await SELECT.one.from(DailyLogs).columns('ID')
+                    .where({ logDate: oLog.logDate, product_ID: oLog.product_ID });
+                if (oDuplicate) {
+                    return req.error(409, `A log for ${oLog.logDate} already exists`);
+                }
+            }
             const oExisting = req.event === 'UPDATE'
                 ? await SELECT.one.from(DailyLogs, req.data.ID).columns('product_ID', 'quantity_quantity', 'unitPrice_amount', 'unitPrice_currency')
                 : {};
