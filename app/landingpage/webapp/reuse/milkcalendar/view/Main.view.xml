@@ -7,7 +7,7 @@
     <Page id="idPageMilkcalendarMain">
     	<customHeader>
 			<Toolbar id="idToolbarHeader">
-				<Title id="idTitleMilkmanName" text="{i18n>milkmanName}" level="H2"/>
+				<Title id="idTitleMilkmanName" level="H2" class="smartMilkmanName" text="{vendor/name}"/>
 				<ToolbarSpacer id="idToolbarSpacerStart"/>
 				<ToolbarSpacer id="idToolbarSpacerEnd"/>
 				<Button id="idButtonEdit" icon="sap-icon://edit" type="Transparent" press=".onEditPress" ariaLabelledBy="editButtonLabel"/>
@@ -16,7 +16,14 @@
 
 		</customHeader>
         <VBox id="idVBoxEditSection" width="100%" height="100%">
-        <HBox id="idHBoxSummary" width="100%" justifyContent="SpaceBetween" alignItems="Start" class="sapUiSmallMargin">
+        <HBox id="idHBoxVendor" width="100%" justifyContent="SpaceBetween" alignItems="Start" class="sapUiSmallMarginTop sapUiSmallMarginBegin">
+            <VBox id="idVBoxVendorEmail" alignItems="Start">
+                <ObjectStatus id="idObjectStatusVendorEmail" title="{i18n>email}" text="{vendor/email}"/>
+            </VBox>
+            <VBox id="idVBoxVendorMobileNo" alignItems="End" class="sapUiMediumMarginEnd">
+                <ObjectStatus id="idObjectStatusVendorMobileNo" title="{i18n>mobileNo}" text="{vendor/mobileNo}"/>
+            </VBox>
+        </HBox>        <HBox id="idHBoxSummary" width="100%" justifyContent="SpaceBetween" alignItems="Start" class="sapUiSmallMargin">
             <VBox id="idVBoxRate" alignItems="Start">
                 <ObjectStatus id="idObjectStatusRate" title="{i18n>rate}" text="{= Number(${unitPrice_amount} || 0) + ' ' + (${unitPrice_currency} || '') + '/' + ${i18n>liter}}"  />
             </VBox>

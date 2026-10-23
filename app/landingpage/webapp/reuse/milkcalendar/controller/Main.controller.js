@@ -34,9 +34,18 @@ sap.ui.define([
             }), "local");
             this.oFormatYyyymmdd = DateFormat.getInstance({ pattern: "yyyy-MM-dd", calendarType: CalendarType.Gregorian });
             this.byId("idUnifiedCalendar").setMaxDate(UI5Date.getInstance());
+            // busy until the first month of logs is loaded, see _initLogs
+            this._setBusy(true);
             this._bindProduct();
             this.byId("idUnifiedCalendar").attachModelContextChange(() => this._initLogs());
             this._bindCurrentMonthSummary();
+        },
+        // Busy indicator of the page; calls can overlap, so it is only cleared when every caller is done
+        _setBusy(bBusy) {
+            const oPage = this.byId("idPageMilkcalendarMain");
+            this._iBusy = Math.max(0, (this._iBusy ?? 0) + (bBusy ? 1 : -1));
+            oPage.setBusyIndicatorDelay(0);
+            oPage.setBusy(this._iBusy > 0);
         },
         // Binds the rate / base quantity section to the first product, if there is one yet
         async _bindProduct() {
@@ -51,6 +60,7 @@ sap.ui.define([
         _initLogs() {
             if (!this._bLogsInitialized && this._getLogsBinding()) {
                 this._bLogsInitialized = true;
+                this._oLogsBinding.attachEventOnce("dataReceived", () => this._setBusy(false));
                 this._loadLogsOfMonth(new Date());
             }
         },
@@ -78,6 +88,8 @@ sap.ui.define([
         _setProductContext(oContext) {
             this._oProductContext = oContext ?? null;
             this.byId("idHBoxSummary").setBindingContext(this._oProductContext);
+            this.byId("idHBoxVendor").setBindingContext(this._oProductContext);
+            this.byId("idTitleMilkmanName").setBindingContext(this._oProductContext);
         },
         // Binds the total summary text to the backend summary of the current month
         async _bindCurrentMonthSummary() {
@@ -126,17 +138,22 @@ sap.ui.define([
 
         },
         async _openDialogForEdit() {
-            this.oEditDialog ??= await this.loadFragment({
-                name: "goalittech.ui.reuse.milkcalendar.fragment.EditDialog"
-            });
-            const oContext = await this._getProductContext();
-            this.oEditDialog.setBindingContext(oContext);
-            const oLocal = this.getView().getModel("local");
-            oLocal.setProperty("/vendorName", oContext.getProperty("vendor/name") ?? "");
-            oLocal.setProperty("/vendorEmail", oContext.getProperty("vendor/email") ?? "");
-            oLocal.setProperty("/vendorAddress", oContext.getProperty("vendor/address") ?? "");
-            oLocal.setProperty("/vendorMobileNo", oContext.getProperty("vendor/mobileNo") ?? "");
-            this.oEditDialog.open();
+            this._setBusy(true);
+            try {
+                this.oEditDialog ??= await this.loadFragment({
+                    name: "goalittech.ui.reuse.milkcalendar.fragment.EditDialog"
+                });
+                const oContext = await this._getProductContext();
+                this.oEditDialog.setBindingContext(oContext);
+                const oLocal = this.getView().getModel("local");
+                oLocal.setProperty("/vendorName", oContext.getProperty("vendor/name") ?? "");
+                oLocal.setProperty("/vendorEmail", oContext.getProperty("vendor/email") ?? "");
+                oLocal.setProperty("/vendorAddress", oContext.getProperty("vendor/address") ?? "");
+                oLocal.setProperty("/vendorMobileNo", oContext.getProperty("vendor/mobileNo") ?? "");
+                this.oEditDialog.open();
+            } finally {
+                this._setBusy(false);
+            }
         },
         // Binds /Products: edits the first product, or creates a new one (saved on Update) when none exists
         async _getProductContext() {
@@ -183,6 +200,8 @@ sap.ui.define([
             const oContext = this.oEditDialog.getBindingContext();
             const sVendorName = (oLocal.getProperty("/vendorName") ?? "").trim();
             const oBundle = this.getView().getModel("i18n").getResourceBundle();
+            this.oEditDialog.setBusyIndicatorDelay(0);
+            this.oEditDialog.setBusy(true);
             try {
                 // not awaited before submitBatch: the PATCH requests are only sent with it
                 const aPatches = [];
@@ -203,13 +222,17 @@ sap.ui.define([
                     throw new Error(oRejected?.reason?.message ?? this._getBackendErrorText(oBundle.getText("saveFailed")));
                 }
                 // reload so that the expanded vendor data reflects the changes
+                // the refresh replaces a context created in this session, so the product has to be requested again
                 this._oProductsBinding.refresh();
-                this._setProductContext(oContext);
+                const [oProductContext] = await this._oProductsBinding.requestContexts(0, 1);
+                this._setProductContext(oProductContext);
                 this._oLogsBinding?.refresh();
                 this.oEditDialog.close();
                 MessageToast.show(oBundle.getText("saveSuccess"));
             } catch (oError) {
                 MessageBox.error(oBundle.getText("saveFailed"), { details: oError.message });
+            } finally {
+                this.oEditDialog.setBusy(false);
             }
         },
         // Joins the error messages the backend reported for the failed request, falls back to the given text
@@ -284,17 +307,30 @@ sap.ui.define([
             oLocal.setProperty("/isDateSelected", true);
             const oDate = oEvent.getSource().getSelectedDates()[0]?.getStartDate();
             const bInterval = oLocal.getProperty("/toggleIntervalSelection");
-            const oContext = oDate && !bInterval ? this._getLogContext(DATE_KEY_FORMAT.format(oDate)) : null;
-            this.byId("idStepInputQuantity").setBindingContext(oContext);
-            if (!bInterval) {
-                oLocal.setProperty("/showQuantity", !!oContext);
+            this._setBusy(true);
+            try {
+                const oContext = oDate && !bInterval ? this._getLogContext(DATE_KEY_FORMAT.format(oDate)) : null;
+                this.byId("idStepInputQuantity").setBindingContext(oContext);
+                if (!bInterval) {
+                    oLocal.setProperty("/showQuantity", !!oContext);
+                }
+                // a transient context is a log that is just being created in the backend
+                if (oContext?.isTransient()) {
+                    await oContext.created();
+                    MessageToast.show(this.getView().getModel("i18n").getResourceBundle().getText("logSaved"));
+                }
+            } catch (oError) {
+                // the rejected log is removed and its error reported by _getLogContext / the message model
+            } finally {
+                this._setBusy(false);
             }
         },
         // Returns the log of the day. A day without a log gets one created right away with the product's
         // default quantity; changing the quantity afterwards updates it. Needs the product of the logs.
         _getLogContext(sDate) {
             const oBinding = this._getLogsBinding();
-            const sProductId = this._oProductContext?.getProperty("ID");
+            // a destroyed product context has no binding anymore
+            const sProductId = this._oProductContext?.getBinding() ? this._oProductContext.getProperty("ID") : null;
             if (!oBinding || !sProductId || sDate > DATE_KEY_FORMAT.format(new Date())) {
                 return null;
             }
