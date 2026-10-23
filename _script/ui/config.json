@@ -3,7 +3,7 @@
 	"hostNamespace": "goalittech.ui",
 	"targetDir": "app/landingpage/webapp/reuse",
 	"prefixLength": 3,
-	"hostConfig": "app/landingpage/webapp/component-router-config.json",
+	"hostConfig": "app/component-router-config.json",
 	"generator": {
 		"floorplan": "FF_SIMPLE",
 		"ui5Version": "1.153.0",

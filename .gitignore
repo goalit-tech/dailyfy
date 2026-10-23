@@ -7,6 +7,10 @@ gen/
 default-*.json
 *.sqlite
 
+# SQLite database files (incl. -shm and -wal)
+*.db
+*.db-*
+
 # MTA
 mta_archives/
 *_mta_build_tmp
