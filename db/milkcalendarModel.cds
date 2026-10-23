@@ -1,14 +1,12 @@
 namespace milk.db;
 
-using {
-    cuid,
-    managed
-} from '@sap/cds/common';
+using {cuid, managed} from '@sap/cds/common';
 
 entity Vendor : cuid, managed {
-    name     : String;
-    address  : String;
-    email    : String;
+    name     : String(80);
+    address  : String(255);
+    email    : String(255);
+    mobileNo : String(15);
     isActive : Boolean default true;
     products : Association to many Product
                    on products.vendor = $self;
@@ -27,9 +25,8 @@ type QuantityUOM {
 };
 
 entity Product : cuid, managed {
-    name            : String;
-    description     : String;
-    productUrl      : String;
+    name            : String(40);
+    description     : String(80);
     unitPrice       : AmountCurrency;
     defaultQuantity : QuantityUOM;
     isActive        : Boolean default true;
@@ -43,5 +40,5 @@ entity Dailylogs : cuid, managed {
     unitPrice   : AmountCurrency;
     totalAmount : AmountCurrency;
     isAbsent    : Boolean default false;
-    remarks     : String;
+    remarks     : String(255);
 }

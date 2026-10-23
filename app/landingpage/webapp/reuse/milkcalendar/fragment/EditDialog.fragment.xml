@@ -29,27 +29,35 @@
 			<f:content>
 				<Label id="idLabelProductName" text="{i18n>productName}" />
 				<Input id="idInputProductName" value="{name}" />
+				<Label id="idLabelProductDescription" text="{i18n>productDescription}" />
+				<Input id="idInputProductDescription" value="{description}"/>
 				<Label id="idLabelVendorName" text="{i18n>vendorName}" />
-				<Input id="idInputVendorName" value="{vendor/name}" editable="false" />
+				<Input id="idInputVendorName" value="{local>/vendorName}" />
+				<Label id="idLabelVendorEmail" text="{i18n>vendorEmail}" />
+				<Input id="idInputVendorEmail" value="{local>/vendorEmail}" type="Email"/>
+				<Label id="idLabelVendorAddress" text="{i18n>vendorAddress}" />
+				<TextArea id="idTextAreaVendorAddress" value="{local>/vendorAddress}" rows="3" />
+				<Label id="idLabelVendorMobileNo" text="{i18n>vendorMobileNo}" />
+				<Input id="idInputVendorMobileNo" value="{local>/vendorMobileNo}" type="Tel" maxLength="15" />
 				<Label id="idLabelRate" text="{i18n>rate}" />
-				<Input id="idInputUnitRate" value="{unitPrice/amount}">
+				<Input id="idInputUnitRate" value="{unitPrice_amount}">
 					<layoutData>
 						<l:GridData id="idGridDataUnitRate" span="XL4 L3 M3 S8" />
 					</layoutData>
 				</Input>
-				<Input id="idInputCurrency" value="{unitPrice/currency}">
+				<Input id="idInputCurrency" value="{unitPrice_currency}">
 					<layoutData>
 						<l:GridData id="idGridDataCurrency" span="XL1 L2 M2 S4" />
 					</layoutData>
 				</Input>
 				<Label id="idLabelBaseQuantity" text="{i18n>baseQuantity}" />
-				<StepInput id="idStepInputBaseQuantity" value="{defaultQuantity/quantity}"
+				<StepInput id="idStepInputBaseQuantity" value="{path: 'defaultQuantity_quantity', type: 'sap.ui.model.type.Float', formatOptions: {decimals: 2}}"
 					min="0" max="5" step="1" displayValuePrecision="2">
 					<layoutData>
 						<l:GridData id="idGridDataBaseQuantity" span="XL4 L3 M3 S8" />
 					</layoutData>
 				</StepInput>
-				<Input id="idInputUom" value="{defaultQuantity/uom}">
+				<Input id="idInputUom" value="{defaultQuantity_uom}">
 					<layoutData>
 						<l:GridData id="idGridDataUom" span="XL1 L2 M2 S4" />
 					</layoutData>
