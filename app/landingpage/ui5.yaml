@@ -2,8 +2,14 @@ specVersion: "4.0"
 metadata:
   name: goalittech.ui
 type: application
+builder:
+  customTasks:
+    - name: component-configuration-task
+      beforeTask: generateComponentPreload
 server:
   customMiddleware:
+    - name: component-configuration-middleware
+      beforeMiddleware: serveResources
     - name: fiori-tools-proxy
       afterMiddleware: compression
       configuration:
@@ -25,3 +31,20 @@ server:
       configuration:
         component: goalittech.ui
         ui5Theme: sap_horizon
+
+---
+specVersion: "4.0"
+kind: extension
+type: server-middleware
+metadata:
+  name: component-configuration-middleware
+middleware:
+  path: tools/componentConfigurationMiddleware.js
+---
+specVersion: "4.0"
+kind: extension
+type: task
+metadata:
+  name: component-configuration-task
+task:
+  path: tools/componentConfigurationTask.js

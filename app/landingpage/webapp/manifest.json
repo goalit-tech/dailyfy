@@ -37,20 +37,6 @@
       "type": "XML",
       "id": "app"
     },
-    "componentUsages": {
-      "sampleComponent": {
-        "name": "goalittech.ui.reuse.sample",
-        "settings": {},
-        "componentData": {},
-        "lazy": true
-      },
-      "milkcalendarComponent": {
-        "name": "goalittech.ui.reuse.milkcalendar",
-        "settings": {},
-        "componentData": {},
-        "lazy": true
-      }
-    },
     "dependencies": {
       "minUI5Version": "1.153.0",
       "libs": {
@@ -110,28 +96,6 @@
           "transition": "show"
         }
       }
-    },
-    "config": {
-      "reuseComponents": [
-        {
-          "key": "sample",
-          "text": "Sample",
-          "description": "Example reuse component with a list and a detail view.",
-          "icon": "sap-icon://product",
-          "usage": "sampleComponent",
-          "prefix": "s",
-          "eventMappings": []
-        },
-        {
-          "key": "milkcalendar",
-          "text": "milkcalendar",
-          "description": "Milk Calendar",
-          "icon": "sap-icon://product",
-          "usage": "milkcalendarComponent",
-          "prefix": "mc",
-          "eventMappings": []
-        }
-      ]
     }
   }
 }
