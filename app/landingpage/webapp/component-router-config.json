@@ -1,8 +1,21 @@
 {
   "componentUsages": {
-   
+    "milkcalendarComponent": {
+      "name": "goalittech.ui.reuse.milkcalendar",
+      "settings": {},
+      "componentData": {},
+      "lazy": true
+    }
   },
   "reuseComponents": [
-  
+    {
+      "key": "milkcalendar",
+      "text": "Milkcalendar",
+      "description": "Milkcalendar reusable component",
+      "icon": "sap-icon://product",
+      "usage": "milkcalendarComponent",
+      "prefix": "mic",
+      "eventMappings": []
+    }
   ]
 }
