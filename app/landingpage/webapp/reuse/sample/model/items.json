@@ -1,7 +1,0 @@
-{
-	"items": [
-		{ "id": "1", "name": "First item", "category": "Alpha", "description": "Description of the first item." },
-		{ "id": "2", "name": "Second item", "category": "Beta", "description": "Description of the second item." },
-		{ "id": "3", "name": "Third item", "category": "Alpha", "description": "Description of the third item." }
-	]
-}

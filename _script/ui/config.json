@@ -1,0 +1,17 @@
+{
+	"namespace": "goalittech.ui.reuse",
+	"hostNamespace": "goalittech.ui",
+	"targetDir": "app/landingpage/webapp/reuse",
+	"prefixLength": 3,
+	"hostConfig": "app/landingpage/webapp/component-router-config.json",
+	"generator": {
+		"floorplan": "FF_SIMPLE",
+		"ui5Version": "1.153.0",
+		"ui5Theme": "sap_horizon",
+		"enableTypeScript": false
+	},
+	"webapp": {
+		"remove": ["index.html", "test", "model"],
+		"templateDir": "_script/ui/templates/webapp"
+	}
+}

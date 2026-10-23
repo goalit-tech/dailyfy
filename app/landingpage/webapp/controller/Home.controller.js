@@ -1,5 +1,5 @@
 sap.ui.define([
-	"goalittech/ui/base/BaseController"
+	"sap/ui/core/mvc/Controller",
 ], function(Controller) {
 	"use strict";
 

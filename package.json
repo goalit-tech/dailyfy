@@ -6,13 +6,13 @@
     "@sap/cds": "^10"
   },
   "devDependencies": {
-    "@cap-js/sqlite": "^3"
+    "@cap-js/sqlite": "^3",
+    "@sap/generator-fiori": "^1.33.0",
+    "yo": "^7.0.1"
   },
   "scripts": {
     "start": "cds-serve",
-    "createuiapp": "node codegeneaterescript/ui/create-ui-app.js",
-    "updateuiversions": "node codegeneaterescript/ui/update-ui-versions.js",
-    "updateversions": "node codegeneaterescript/ui/update-ui-versions.js --project"
+    "createuiapp": "node _script/ui/create-ui-app.js"
   },
   "private": true
 }
