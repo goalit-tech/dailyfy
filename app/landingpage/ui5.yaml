@@ -39,7 +39,7 @@ type: server-middleware
 metadata:
   name: component-configuration-middleware
 middleware:
-  path: tools/componentConfigurationMiddleware.js
+  path: ../../srv/ui-component-middleware/index.js
 ---
 specVersion: "4.0"
 kind: extension
@@ -47,4 +47,4 @@ type: task
 metadata:
   name: component-configuration-task
 task:
-  path: tools/componentConfigurationTask.js
+  path: ../../srv/ui-component-middleware/index.js

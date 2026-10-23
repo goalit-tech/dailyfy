@@ -18,10 +18,10 @@
         <f:content>
         <FlexBox id="calendarBox" width="100%" height="100%" fitContainer="true">
     <VBox id="editSection" width="100%" height="100%">
-        <ObjectStatus title="Rate" text="50 ₹"/>
-        <ObjectStatus title="Base Qty" text="1 Liter"/>
-        <ObjectStatus title="Current Month" text="12 Days"/>
-        <ObjectStatus title="Total" text="600 ₹"/>
+        <ObjectStatus id="_IDGenObjectStatusRate" title="Rate" text="50 ₹"/>
+        <ObjectStatus id="_IDGenObjectStatusBaseQty" title="Base Qty" text="1 Liter"/>
+        <ObjectStatus id="_IDGenObjectStatusCurrentMonth" title="Current Month" text="12 Days"/>
+        <ObjectStatus id="_IDGenObjectStatusTotal" title="Total" text="600 ₹"/>
     </VBox>
         <VBox id="calendarSection" width="100%" height="100%" >
                     <unified:Calendar id="dailyLogsCalendar" width="100%" class="smartDailyCalendar" select=".onDateSelect"
