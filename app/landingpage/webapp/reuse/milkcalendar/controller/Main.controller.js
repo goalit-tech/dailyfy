@@ -4,8 +4,9 @@ sap.ui.define([
     'sap/base/i18n/date/CalendarType',
     "sap/ui/model/json/JSONModel",
     "sap/base/security/encodeXML",
+    "sap/base/strings/formatMessage",
     "sap/ui/core/ValueState"
-], (Controller, DateFormat, CalendarType, JSONModel, encodeXML, ValueState) => {
+], (Controller, DateFormat, CalendarType, JSONModel, encodeXML, formatMessage, ValueState) => {
     "use strict";
 
     const DATE_KEY_FORMAT = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
@@ -72,12 +73,18 @@ sap.ui.define([
             this.oEditDialog.close();
         },
 
-        formatTotalSummary(sCurrency, fAmount, fLiters, iDays) {
+        formatTotalSummary(sCurrency, fAmount, fLiters, iDays, sSummaryText, sLitersText, sDaysText) {
             const highlight = (sText, sColor) =>
                 `<strong style="color:${sColor}">${encodeXML(String(sText))}</strong>`;
-            return `Total Amount: ${highlight(`${sCurrency ?? ""}${fAmount ?? 0}`, "#e9730c")} for ` +
-                `${highlight(`${fLiters ?? 0} liters`, "#0a6ed1")} over ` +
-                `${highlight(`${iDays ?? 0} days`, "#107e3e")}`;
+            // the i18n texts come from the app's own resource bundle; the substituted values are encoded in highlight()
+            return formatMessage(sSummaryText ?? "", [
+                highlight(`${sCurrency ?? ""}${fAmount ?? 0}`, "#e9730c"),
+                highlight(formatMessage(sLitersText ?? "", [fLiters ?? 0]), "#0a6ed1"),
+                highlight(formatMessage(sDaysText ?? "", [iDays ?? 0]), "#107e3e")
+            ]);
+        },
+        formatMonthlySummary(sText, sCurrency, fAmount, fLiters, iDays) {
+            return formatMessage(sText ?? "", [sCurrency ?? "", fAmount ?? 0, fLiters ?? 0, iDays ?? 0]);
         },
         formatCalendarDate(value) {
             return value ? DATE_KEY_FORMAT.parse(value) : null;
@@ -94,7 +101,11 @@ sap.ui.define([
         },
         handleCalendarSelect(oEvent) {
             var oCalendar = oEvent.getSource();
-            this._updateText(oCalendar.getSelectedDates()[0]);
+            if (oCalendar.getSelectedDates().length === 1) {
+                this._onSingleDateSelect(oEvent);
+            } else {
+                this._updateText(oCalendar.getSelectedDates()[0]);
+            }
         },
 
         _updateText(oSelectedDates) {
@@ -116,12 +127,12 @@ sap.ui.define([
         },
 
 
-        onDateSelect(oEvent) {
+        _onSingleDateSelect(oEvent) {
             this.getView().getModel("local").setProperty("/isDateSelected", true);
             const oDate = oEvent.getSource().getSelectedDates()[0]?.getStartDate();
             const sKey = oDate && DATE_KEY_FORMAT.format(oDate);
             const iIndex = this.getView().getModel("cal").getProperty("/days").findIndex((o) => o.logDate === sKey);
-            this.byId("SI").bindElement({ path: `/days/${iIndex}`, model: "cal" });
+            this.byId("idStepInputQuantity").bindElement({ path: `/days/${iIndex}`, model: "cal" });
             if (!this.getView().getModel("local").getProperty("/toggleIntervalSelection")) {
                 this.getView().getModel("local").setProperty("/showQuantity", true);
             }

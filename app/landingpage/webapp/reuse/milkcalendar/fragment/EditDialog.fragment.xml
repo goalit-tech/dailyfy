@@ -3,14 +3,14 @@
         xmlns:l="sap.ui.layout"
 	    xmlns:f="sap.ui.layout.form"
 		xmlns:core="sap.ui.core">
-	<Dialog
+	<Dialog id="idDialogEdit"
 		title="{i18n>editDialogTitle}"
         contentWidth="100%"
         contentHeight="100%"
         stretch="true"
 		>
-        <VBox class="sapUiSmallMargin">
-		<f:SimpleForm 
+        <VBox id="idVBoxEditForm" class="sapUiSmallMargin">
+		<f:SimpleForm id="idSimpleFormEdit"
 			editable="true"
 			layout="ResponsiveGridLayout"
 			labelSpanXL="3"
@@ -27,37 +27,37 @@
 			columnsM="1"
 			singleContainerFullSize="false" >
 			<f:content>
-				<Label text="Vendor Name" />
-				<Input value="{vendorName}" />
-				<Label text="Rate" />
-				<Input value="{unitRate}">
+				<Label id="idLabelVendorName" text="{i18n>vendorName}" />
+				<Input id="idInputVendorName" value="{vendorName}" />
+				<Label id="idLabelRate" text="{i18n>rate}" />
+				<Input id="idInputUnitRate" value="{unitRate}">
 					<layoutData>
-						<l:GridData id="unitRateGridData" span="XL4 L3 M3 S8" />
+						<l:GridData id="idGridDataUnitRate" span="XL4 L3 M3 S8" />
 					</layoutData>
 				</Input>
-				<Input value="{currency}">
+				<Input id="idInputCurrency" value="{currency}">
 					<layoutData>
-						<l:GridData span="XL1 L2 M2 S4" />
+						<l:GridData id="idGridDataCurrency" span="XL1 L2 M2 S4" />
 					</layoutData>
 				</Input>
-				<Label text="Base Quantity" />
-				<StepInput id="baseQuantityInput" value="{baseQuantity}"
+				<Label id="idLabelBaseQuantity" text="{i18n>baseQuantity}" />
+				<StepInput id="idStepInputBaseQuantity" value="{baseQuantity}"
 					min="0" max="5" step="1" displayValuePrecision="2">
 					<layoutData>
-						<l:GridData id="baseQuantityGridData" span="XL4 L3 M3 S8" />
+						<l:GridData id="idGridDataBaseQuantity" span="XL4 L3 M3 S8" />
 					</layoutData>
 				</StepInput>
-				<Input value="{uom}">
+				<Input id="idInputUom" value="{uom}">
 					<layoutData>
-						<l:GridData span="XL1 L2 M2 S4" />
+						<l:GridData id="idGridDataUom" span="XL1 L2 M2 S4" />
 					</layoutData>
 				</Input>
 			</f:content>
 		</f:SimpleForm>
 	</VBox>
     <buttons>
-        <Button text="{i18n>cancel}" press=".onCancelEditDialogPress"/>
-        <Button text="{i18n>update}" press=".onUpdateEditDialogPress"/>
+        <Button id="idButtonCancel" text="{i18n>cancel}" press=".onCancelEditDialogPress"/>
+        <Button id="idButtonUpdate" text="{i18n>update}" press=".onUpdateEditDialogPress"/>
     </buttons>
 	</Dialog>
 </core:FragmentDefinition>

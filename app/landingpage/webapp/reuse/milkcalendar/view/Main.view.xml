@@ -3,37 +3,37 @@
      xmlns:f="sap.f"
     xmlns:unified="sap.ui.unified"
     xmlns="sap.m">
-    <Page id="idMilkcalendarMainPage">
+    <Page id="idPageMilkcalendarMain">
     	<customHeader>
-			<Toolbar>
-				<Title text="Milkman Name" level="H2"/>
-				<ToolbarSpacer/>
-				<ToolbarSpacer/>
-				<Button icon="sap-icon://edit" type="Transparent" press=".onEditPress" ariaLabelledBy="editButtonLabel"/>
-				<ToggleButton icon="sap-icon://select-appointments" pressed="{local>/toggleIntervalSelection}" type="{=${local>/toggleIntervalSelection ? 'Emphasized' : 'Transparent'}}" press=".onCalendarTogglePress"/>
+			<Toolbar id="idToolbarHeader">
+				<Title id="idTitleMilkmanName" text="{i18n>milkmanName}" level="H2"/>
+				<ToolbarSpacer id="idToolbarSpacerStart"/>
+				<ToolbarSpacer id="idToolbarSpacerEnd"/>
+				<Button id="idButtonEdit" icon="sap-icon://edit" type="Transparent" press=".onEditPress" ariaLabelledBy="editButtonLabel"/>
+				<ToggleButton id="idToggleButtonSelectAppointments" icon="sap-icon://select-appointments" pressed="{local>/toggleIntervalSelection}" type="{=${local>/toggleIntervalSelection ? 'Emphasized' : 'Transparent'}}" press=".onCalendarTogglePress"/>
 			</Toolbar>
 
 		</customHeader>
-        <VBox id="editSection" width="100%" height="100%">
-        <HBox width="100%" justifyContent="SpaceBetween" alignItems="Start" class="sapUiSmallMargin">
-            <VBox alignItems="Start">
-                <ObjectStatus id="_IDGenObjectStatusRate" title="Rate" text="50 ₹/Liter"  />
+        <VBox id="idVBoxEditSection" width="100%" height="100%">
+        <HBox id="idHBoxSummary" width="100%" justifyContent="SpaceBetween" alignItems="Start" class="sapUiSmallMargin">
+            <VBox id="idVBoxRate" alignItems="Start">
+                <ObjectStatus id="idObjectStatusRate" title="{i18n>rate}" text="50 ₹/Liter"  />
             </VBox>
-            <VBox alignItems="End" class="sapUiMediumMarginEnd">
-             <ObjectStatus id="_IDGenObjectStatusBaseQty" title="Base Qty" text="{cal>/baseQty} Liter"  />
+            <VBox id="idVBoxBaseQty" alignItems="End" class="sapUiMediumMarginEnd">
+             <ObjectStatus id="idObjectStatusBaseQty" title="{i18n>baseQty}" text="{= ${cal>/baseQty} + ' ' + ${i18n>liter}}"  />
             </VBox>
         </HBox>
-        <FormattedText id="totalAmountText" class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
-            htmlText="{parts: [{path: 'summary>/currency'}, {path: 'summary>/totalAmount'}, {path: 'summary>/liters'}, {path: 'summary>/days'}], formatter: '.formatTotalSummary'}" />
-        <FlexBox id="calendarBox" width="100%" fitContainer="true">
+        <FormattedText id="idFormattedTextTotalAmount" class="sapUiSmallMarginBeginEnd sapUiTinyMarginBottom"
+            htmlText="{parts: [{path: 'summary>/currency'}, {path: 'summary>/totalAmount'}, {path: 'summary>/liters'}, {path: 'summary>/days'}, {path: 'i18n>totalSummary'}, {path: 'i18n>totalSummaryLiters'}, {path: 'i18n>totalSummaryDays'}], formatter: '.formatTotalSummary'}" />
+        <FlexBox id="idFlexBoxCalendar" width="100%" fitContainer="true">
         
-        <VBox id="calendarSection" width="100%" height="100%" >
-            <unified:Calendar id="dailyLogsCalendar" width="100%" class="smartDailyCalendar" 
+        <VBox id="idVBoxCalendar" width="100%" height="100%" >
+            <unified:Calendar id="idUnifiedCalendar" width="100%" class="smartDailyCalendar" 
                 select=".handleCalendarSelect"
                 intervalSelection="{local>/toggleIntervalSelection}"
                 specialDates="{path: 'cal>/days', templateShareable: false}">
                 <unified:specialDates>
-                    <unified:DateTypeRange id="dailyLogDate"
+                    <unified:DateTypeRange id="idUnifiedDateTypeRange"
                         startDate="{path: 'cal>logDate', formatter: '.formatCalendarDate'}"
                         type="{parts: [{path: 'cal>quantity'}, {path: 'cal>/baseQty'}], formatter: '.formatCalendarType'}"
                         tooltip="{cal>remarks}" />
@@ -41,24 +41,24 @@
             </unified:Calendar>
         </VBox>
         </FlexBox>
-        <List id="monthlySummaryList" visible="{local>/toggleIntervalSelection}" items="{monthly>/months}"
-            headerText="Monthly Milk Consumption" class="sapUiSmallMarginTop" noDataText="No monthly data">
-            <CustomListItem>
-                <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMargin">
-                    <VBox>
-                        <Title text="{monthly>month}" level="H4"/>
-                        <Text text="Amount: {summary>/currency}{monthly>amount}  |  {monthly>liters} L  |  {monthly>days} Days"/>
+        <List id="idListMonthlySummary" visible="{local>/toggleIntervalSelection}" items="{monthly>/months}"
+            headerText="{i18n>monthlySummaryHeader}" class="sapUiSmallMarginTop" noDataText="{i18n>monthlySummaryNoData}">
+            <CustomListItem id="idCustomListItemMonthly">
+                <HBox id="idHBoxMonthly" justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMargin">
+                    <VBox id="idVBoxMonthlyDetails">
+                        <Title id="idTitleMonth" text="{monthly>month}" level="H4"/>
+                        <Text id="idTextMonthlyAmount" text="{parts: [{path: 'i18n>monthlySummaryDetails'}, {path: 'summary>/currency'}, {path: 'monthly>amount'}, {path: 'monthly>liters'}, {path: 'monthly>days'}], formatter: '.formatMonthlySummary'}"/>
                     </VBox>
-                    <ObjectStatus text="{= ${monthly>paid} ? 'Paid' : 'Not Paid'}"
+                    <ObjectStatus id="idObjectStatusPaid" text="{= ${monthly>paid} ? ${i18n>paid} : ${i18n>notPaid}}"
                         state="{= ${monthly>paid} ? 'Success' : 'Error'}"
                         icon="{= ${monthly>paid} ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}"
                         inverted="false"/>
                 </HBox>
             </CustomListItem>
         </List>
-        <HBox class="sapUiTinyMargin" visible="{= ${local>/showQuantity} &amp;&amp; !${local>/toggleIntervalSelection}}">
-			<Label text="Quantity:" labelFor="SI" class="sapUiTinyMarginTop sapUiTinyMarginEnd"/>
-			<StepInput id="SI" width="12rem"
+        <HBox id="idHBoxQuantity" class="sapUiTinyMargin" visible="{= ${local>/showQuantity} &amp;&amp; !${local>/toggleIntervalSelection}}">
+			<Label id="idLabelQuantity" text="{i18n>quantity}" labelFor="idStepInputQuantity" class="sapUiTinyMarginTop sapUiTinyMarginEnd"/>
+			<StepInput id="idStepInputQuantity" width="12rem"
                 value="{cal>quantity}"
                 min="0" max="5" step="1" displayValuePrecision="2"
                 valueState="{parts: [{path: 'cal>quantity'}, {path: 'cal>/baseQty'}], formatter: '.formatQuantityState'}"/>
