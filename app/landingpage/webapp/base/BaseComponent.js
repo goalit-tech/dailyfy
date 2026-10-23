@@ -45,7 +45,10 @@ sap.ui.define([
 					type: "Component",
 					usage: oReuse.usage,
 					title: oReuse.title || oReuse.text,
-					id: oReuse.usage
+					id: oReuse.usage,
+					containerOptions: {
+						propagateModel: true
+					}
 				});
 				oRouter.addRoute({
 					name: oReuse.key,

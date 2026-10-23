@@ -11,7 +11,7 @@
                         <OverflowToolbarLayoutData priority="NeverOverflow" />
                     </layoutData>
                 </Button>
-                <Title id="appTitle" text="{i18n>appName}" level="H1" wrapping="false">
+                <Title id="appTitle" text="{landingpage>/appTitle}" level="H1" wrapping="false">
                     <layoutData>
                         <OverflowToolbarLayoutData priority="Disappear" />
                     </layoutData>

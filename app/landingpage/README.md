@@ -20,6 +20,28 @@ webapp/
   reuse/<name>/                   one folder per reuse component (see reuse/sample)
 ```
 
+## Shared landingpage model
+
+The host declares the `landingpage` JSON model in `webapp/manifest.json`,
+with initial data in `webapp/model/landingpage.json`. Reuse component targets
+enable model propagation, so their views can bind to the same model:
+
+```xml
+<Title text="{landingpage>/appTitle}" />
+```
+
+The shell's `App.controller.js` updates `/appTitle` centrally when a host
+route matches. Reuse routes show the `text` from the runtime manifest's
+`sap.ui5/config/reuseComponents` entry (via `getReuseComponents()`), without
+reading `component-router-config.json` directly. The home page and
+unknown routes restore the initial title from `landingpage.json`. This works
+for tile clicks, side navigation, direct links, reloads, and browser Back/Forward.
+The update waits for the initial JSON data to load so it cannot overwrite the
+route-specific title afterward. Click handlers only need to navigate.
+
+Do not declare a separate `landingpage` model in reuse components; it would
+override the inherited model.
+
 ## Adding a new reuse component
 
 1. Copy `webapp/reuse/sample` to `webapp/reuse/<name>` and replace `goalittech.ui.reuse.sample`
