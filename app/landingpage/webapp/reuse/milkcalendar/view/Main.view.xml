@@ -4,7 +4,6 @@
     xmlns:unified="sap.ui.unified"
     xmlns="sap.m">
     <Page id="idMilkcalendarMainPage">
-    <!-- xmlns:macros="sap.fe.macros" -->
     	<customHeader>
 			<Toolbar>
 				<Title text="Milkman Name" level="H2"/>
@@ -29,8 +28,8 @@
         <FlexBox id="calendarBox" width="100%" fitContainer="true">
         
         <VBox id="calendarSection" width="100%" height="100%" >
-            <unified:Calendar id="dailyLogsCalendar" width="100%" class="smartDailyCalendar" select=".onDateSelect"
-                singleSelection="true"
+            <unified:Calendar id="dailyLogsCalendar" width="100%" class="smartDailyCalendar" 
+                select=".handleCalendarSelect"
                 intervalSelection="{local>/toggleIntervalSelection}"
                 specialDates="{path: 'cal>/days', templateShareable: false}">
                 <unified:specialDates>
@@ -59,8 +58,9 @@
         </List>
         <HBox class="sapUiTinyMargin" visible="{= ${local>/showQuantity} &amp;&amp; !${local>/toggleIntervalSelection}}">
 			<Label text="Quantity:" labelFor="SI" class="sapUiTinyMarginTop sapUiTinyMarginEnd"/>
-			<StepInput id="SI" min="0" max="4" width="12rem"
+			<StepInput id="SI" width="12rem"
                 value="{cal>quantity}"
+                min="0" max="5" step="1" displayValuePrecision="2"
                 valueState="{parts: [{path: 'cal>quantity'}, {path: 'cal>/baseQty'}], formatter: '.formatQuantityState'}"/>
 		</HBox>
         </VBox>

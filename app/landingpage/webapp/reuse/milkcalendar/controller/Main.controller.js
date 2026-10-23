@@ -1,10 +1,11 @@
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/core/format/DateFormat",
+    'sap/base/i18n/date/CalendarType',
     "sap/ui/model/json/JSONModel",
     "sap/base/security/encodeXML",
     "sap/ui/core/ValueState"
-], (Controller, DateFormat, JSONModel, encodeXML, ValueState) => {
+], (Controller, DateFormat, CalendarType, JSONModel, encodeXML, ValueState) => {
     "use strict";
 
     const DATE_KEY_FORMAT = DateFormat.getDateInstance({ pattern: "yyyy-MM-dd" });
@@ -12,6 +13,7 @@ sap.ui.define([
     const CALENDAR_TYPE = { Error: "Type02", Warning: "Type06", Success: "Type08" };
 
     return Controller.extend("goalittech.ui.reuse.milkcalendar.controller.Main", {
+        oFormatYyyymmdd: null,
         onInit() {
             this.getView().setModel(new JSONModel({
                 totalAmount: 240,
@@ -34,20 +36,42 @@ sap.ui.define([
             }), "monthly");
             this.getView().setModel(new JSONModel({
                 showQuantity: false,
-                toggleIntervalSelection: false
+                toggleIntervalSelection: false,
+                isDateSelected: false
             }), "local");
+            this.oFormatYyyymmdd = DateFormat.getInstance({ pattern: "yyyy-MM-dd", calendarType: CalendarType.Gregorian });
         },
-        onCalendarTogglePress: function () {
+        onCalendarTogglePress(oEvent) {
+            if (oEvent.getParameter("pressed") === false) {
+                this.getView().getModel("local").setProperty("/toggleIntervalSelection", false);
+                if (this.getView().getModel("local").getProperty("/isDateSelected")) {
+                    this.getView().getModel("local").setProperty("/showQuantity", true);
+                }
+                return;
+            }
             this.getView().getModel("local").setProperty("/showQuantity", false);
-        },
-        onEditPress: function () {
             this.getView().getModel("local").setProperty("/toggleIntervalSelection", true);
-            this.getView().getModel("local").setProperty("/showQuantity", false);
         },
-        onCancelPress: function () {
+        onEditPress() {
             this.getView().getModel("local").setProperty("/toggleIntervalSelection", false);
             this.getView().getModel("local").setProperty("/showQuantity", false);
+            this._openDialogForEdit();
+
         },
+        async _openDialogForEdit() {
+            this.oEditDialog ??= await this.loadFragment({
+                name: "goalittech.ui.reuse.milkcalendar.fragment.EditDialog"
+            });
+            this.oEditDialog.open();
+        },
+        onUpdateEditDialogPress() {
+            this.oEditDialog.close();
+        },
+
+        onCancelEditDialogPress() {
+            this.oEditDialog.close();
+        },
+
         formatTotalSummary(sCurrency, fAmount, fLiters, iDays) {
             const highlight = (sText, sColor) =>
                 `<strong style="color:${sColor}">${encodeXML(String(sText))}</strong>`;
@@ -68,12 +92,37 @@ sap.ui.define([
         formatCalendarType(fQuantity, fBaseQty) {
             return CALENDAR_TYPE[this.formatQuantityState(fQuantity, fBaseQty)];
         },
+        handleCalendarSelect(oEvent) {
+            var oCalendar = oEvent.getSource();
+            this._updateText(oCalendar.getSelectedDates()[0]);
+        },
+
+        _updateText(oSelectedDates) {
+            var oDate, fromDate, toDate;
+
+            if (oSelectedDates) {
+                oDate = oSelectedDates.getStartDate();
+                if (oDate) {
+                    fromDate = this.oFormatYyyymmdd.format(oDate);
+                }
+                oDate = oSelectedDates.getEndDate();
+                if (oDate) {
+                    toDate = this.oFormatYyyymmdd.format(oDate);
+                }
+            } else {
+                fromDate = null;
+                toDate = null;
+            }
+        },
+
+
         onDateSelect(oEvent) {
+            this.getView().getModel("local").setProperty("/isDateSelected", true);
             const oDate = oEvent.getSource().getSelectedDates()[0]?.getStartDate();
             const sKey = oDate && DATE_KEY_FORMAT.format(oDate);
             const iIndex = this.getView().getModel("cal").getProperty("/days").findIndex((o) => o.logDate === sKey);
             this.byId("SI").bindElement({ path: `/days/${iIndex}`, model: "cal" });
-            if(!this.getView().getModel("local").getProperty("/toggleIntervalSelection")) {
+            if (!this.getView().getModel("local").getProperty("/toggleIntervalSelection")) {
                 this.getView().getModel("local").setProperty("/showQuantity", true);
             }
         },

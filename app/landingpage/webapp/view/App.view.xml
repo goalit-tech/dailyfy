@@ -32,17 +32,8 @@
                 </tnt:NavigationList>
             </tnt:SideNavigation>
         </tnt:sideContent>
-		<!-- <tnt:sideContent>
-			<tnt:SideNavigation itemSelect=".onItemSelect">
-				<tnt:NavigationList id="navigationList">
-					<tnt:NavigationListItem text="{i18n>homeTitle}"
-						icon="sap-icon://home"
-						key="home" />
-				</tnt:NavigationList>
-			</tnt:SideNavigation>
-		</tnt:sideContent> -->
 		<tnt:mainContents>
-			<App id="landingpageContent" />
+            <App id="landingpageContent" autoFocus="false" />
 		</tnt:mainContents>
 	</tnt:ToolPage>
 </mvc:View>
