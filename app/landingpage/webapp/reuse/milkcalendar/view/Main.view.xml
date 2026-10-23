@@ -10,8 +10,8 @@
 				<Title text="Milkman Name" level="H2"/>
 				<ToolbarSpacer/>
 				<ToolbarSpacer/>
-				<Button icon="sap-icon://edit" type="Transparent" press=".onPress" ariaLabelledBy="editButtonLabel"/>
-				<Button icon="sap-icon://select-appointments" type="Transparent" press=".onPress" ariaLabelledBy="editButtonLabel"/>
+				<Button icon="sap-icon://edit" type="Transparent" press=".onEditPress" ariaLabelledBy="editButtonLabel"/>
+				<ToggleButton icon="sap-icon://select-appointments" pressed="{local>/toggleIntervalSelection}" type="{=${local>/toggleIntervalSelection ? 'Emphasized' : 'Transparent'}}" press=".onCalendarTogglePress"/>
 			</Toolbar>
 
 		</customHeader>
@@ -31,7 +31,7 @@
         <VBox id="calendarSection" width="100%" height="100%" >
             <unified:Calendar id="dailyLogsCalendar" width="100%" class="smartDailyCalendar" select=".onDateSelect"
                 singleSelection="true"
-                intervalSelection="true"
+                intervalSelection="{local>/toggleIntervalSelection}"
                 specialDates="{path: 'cal>/days', templateShareable: false}">
                 <unified:specialDates>
                     <unified:DateTypeRange id="dailyLogDate"
@@ -42,7 +42,22 @@
             </unified:Calendar>
         </VBox>
         </FlexBox>
-        <HBox class="sapUiTinyMargin">
+        <List id="monthlySummaryList" visible="{local>/toggleIntervalSelection}" items="{monthly>/months}"
+            headerText="Monthly Milk Consumption" class="sapUiSmallMarginTop" noDataText="No monthly data">
+            <CustomListItem>
+                <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMargin">
+                    <VBox>
+                        <Title text="{monthly>month}" level="H4"/>
+                        <Text text="Amount: {summary>/currency}{monthly>amount}  |  {monthly>liters} L  |  {monthly>days} Days"/>
+                    </VBox>
+                    <ObjectStatus text="{= ${monthly>paid} ? 'Paid' : 'Not Paid'}"
+                        state="{= ${monthly>paid} ? 'Success' : 'Error'}"
+                        icon="{= ${monthly>paid} ? 'sap-icon://sys-enter-2' : 'sap-icon://error'}"
+                        inverted="false"/>
+                </HBox>
+            </CustomListItem>
+        </List>
+        <HBox class="sapUiTinyMargin" visible="{= ${local>/showQuantity} &amp;&amp; !${local>/toggleIntervalSelection}}">
 			<Label text="Quantity:" labelFor="SI" class="sapUiTinyMarginTop sapUiTinyMarginEnd"/>
 			<StepInput id="SI" min="0" max="4" width="12rem"
                 value="{cal>quantity}"
