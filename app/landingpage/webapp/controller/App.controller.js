@@ -10,6 +10,11 @@ sap.ui.define([
 		onInit: function() {
 			Log.info(this.getView().getControllerName(), "onInit");
 
+			var oLandingpageModel = this.getOwnerComponent().getModel("landingpage");
+			this._pDefaultAppTitle = oLandingpageModel.dataLoaded().then(function() {
+				return oLandingpageModel.getProperty("/appTitle");
+			});
+
 			var oRouter = this.getOwnerComponent().getRouter();
 			oRouter.attachRouteMatched(this._onRouteMatched, this);
 			oRouter.attachBypassed(this._onBypassed, this);
@@ -45,6 +50,19 @@ sap.ui.define([
 
 			// select the corresponding item in the left menu
 			this.byId("navigationList").setSelectedKey(oConfig.name);
+			var oReuse = this.getOwnerComponent().getReuseComponents().find(function(oComponent) {
+				return oComponent.key === oConfig.name;
+			});
+			this._updateAppTitle(oReuse ? oReuse.text : undefined);
+		},
+
+		_updateAppTitle: function(sTitle) {
+			var oModel = this.getOwnerComponent().getModel("landingpage");
+			return this._pDefaultAppTitle.then(function(sDefaultTitle) {
+				oModel.setProperty("/appTitle", sTitle === undefined ? sDefaultTitle : sTitle);
+			}, function(oError) {
+				Log.error("Failed to load the landingpage model for the application title", String(oError));
+			});
 		},
 
 		_onBypassed: function(oEvent) {
@@ -52,6 +70,7 @@ sap.ui.define([
 				this.getView().getControllerName(),
 				"_onBypassed Hash=" + oEvent.getParameter("hash")
 			);
+			this._updateAppTitle();
 		},
 
 		onItemSelect: function(oEvent) {

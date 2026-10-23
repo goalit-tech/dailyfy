@@ -10,8 +10,8 @@
   "reuseComponents": [
     {
       "key": "milkcalendar",
-      "text": "Milkcalendar",
-      "description": "Milkcalendar reusable component",
+      "text": "Milk Calendar",
+      "description": "Milk Calendar",
       "icon": "sap-icon://product",
       "usage": "milkcalendarComponent",
       "prefix": "mic",
