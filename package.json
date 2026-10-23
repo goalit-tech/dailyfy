@@ -14,5 +14,19 @@
     "start": "cds-serve",
     "createuiapp": "node _script/ui/create-ui-app.js"
   },
-  "private": true
+  "private": true,
+  "workspaces": [
+    "app/*"
+  ],
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "model": "db",
+        "credentials": {
+          "url": "dailyfy.db"
+        }
+      }
+    }
+  }
 }

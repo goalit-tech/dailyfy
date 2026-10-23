@@ -1,0 +1,42 @@
+<mvc:View controllerName="goalittech.ui.reuse.milkcalendar.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+     xmlns:f="sap.f"
+    xmlns:unified="sap.ui.unified"
+    xmlns="sap.m">
+    <f:DynamicPage id="idMilkcalendarMainPage" headerExpanded="true" toggleHeaderOnTitleClick="false">
+    <!-- xmlns:macros="sap.fe.macros" -->
+        <f:title>
+            <f:DynamicPageTitle id="dailyLogsTitle">
+                <f:heading>
+                    <Title id="dailyLogsHeading" text="{i18n>title}" />
+                </f:heading>
+                <f:actions>
+                    <Button id="showAllDates" text="{i18n>showAllDates}" icon="sap-icon://edit" press=".onEditPress" />
+                </f:actions>
+            </f:DynamicPageTitle>
+        </f:title>
+        <f:content>
+        <FlexBox id="calendarBox" width="100%" height="100%" fitContainer="true">
+    <VBox id="editSection" width="100%" height="100%">
+        <ObjectStatus title="Rate" text="50 ₹"/>
+        <ObjectStatus title="Base Qty" text="1 Liter"/>
+        <ObjectStatus title="Current Month" text="12 Days"/>
+        <ObjectStatus title="Total" text="600 ₹"/>
+    </VBox>
+        <VBox id="calendarSection" width="100%" height="100%" >
+                    <unified:Calendar id="dailyLogsCalendar" width="100%" class="smartDailyCalendar" select=".onDateSelect"
+                        singleSelection="true"
+                        intervalSelection="false"
+                        specialDates="{path: '/DailyLogs', templateShareable: false}">
+                        <unified:specialDates>
+                            <unified:DateTypeRange id="dailyLogDate"
+                                startDate="{path: 'logDate', formatter: '.formatCalendarDate'}"
+                                type="{path: 'isAbsent', formatter: '.formatCalendarType'}"
+                                tooltip="{remarks}" />
+                        </unified:specialDates>
+                    </unified:Calendar>
+                </VBox>
+        </FlexBox>
+        </f:content>
+    </f:DynamicPage>
+</mvc:View>
